@@ -17,6 +17,7 @@
  *
  * Cuando ejecutes la función main1 deberá mostrar por pantalla el resultado.
  */
+
 package com.proferoman.part1
 
 fun isPrime(n: Int): Boolean {
@@ -56,24 +57,22 @@ class PrimeCal {
     }
 }
 
-fun launchPrimeCal(n: Int): String {
+fun main1() {
+    println("Ejecutando main1 que es el proceso padre")
+
     val className = "com.proferoman.part1.PrimeCal"
     val classPath = System.getProperty("java.class.path")
 
-    println("Aqui se inicia el proceso hijo")
     val processBuilder = ProcessBuilder(
         "java", "-cp", classPath, className,
-        n.toString()
+        "10000"
     )
+
+    println("Iniciando el proceso hijo...")
 
     val primeProcess = processBuilder.start()
     val result = primeProcess.inputStream.bufferedReader().readText()
     primeProcess.waitFor()
-    return result
-}
 
-fun main1() {
-    println("Ejecutando main1 que es el proceso padre")
-    val result = launchPrimeCal(10000)
-    print("El mayor número primo hasta el 10000 es el número $result")
+    println("El mayor número primo hasta el 10000 es el número $result")
 }

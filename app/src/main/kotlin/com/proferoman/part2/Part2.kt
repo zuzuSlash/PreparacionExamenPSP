@@ -14,9 +14,9 @@
  * "Hay un total de 13 vocales en el texto"
  */
 package com.proferoman.part2
+
 import java.io.File
 import java.util.*
-
 
 class VocalCount {
     companion object {
@@ -29,31 +29,14 @@ class VocalCount {
 
             val text = args[0]
             val filePath = args[1]
-
             vocalCount(text, filePath)
-
         }
     }
 }
 
-fun launchVocal(text: String, resultFile: String) {
-    val className = "com.proferoman.part2.VocalCount"
-    val classPath = System.getProperty("java.class.path")
-
-    println("Aqui se inicia el proceso hijo")
-    val processBuilder = ProcessBuilder(
-        "java", "-cp", classPath, className,
-        text, resultFile
-    )
-
-    val vocalProcess = processBuilder.start()
-    vocalProcess.waitFor() // Con el waitfor esperamos a que el proceso hijo termine
-
-}
-
-fun vocalCount(text: String, fileName: String){
-    var countVocal = 0;
-    val vocales = setOf('a','e','i','o','u')
+fun vocalCount(text: String, fileName: String) {
+    var countVocal = 0
+    val vocales = setOf('a', 'e', 'i', 'o', 'u')
 
     val lowerText = text.lowercase(Locale.getDefault())
         .replace("á", "a")
@@ -70,21 +53,32 @@ fun vocalCount(text: String, fileName: String){
 
     val file = File(fileName)
     file.writeText(countVocal.toString())
-
 }
-
-
 
 fun main2(text: String) {
     println("Ejecutando main2 que es el proceso padre")
+
+    // Definimos el directorio y el archivo para el resultado
     val pathDir = "./files/part2"
     val resultFile = "$pathDir/vocalCountResult.txt"
-    launchVocal(text, resultFile)
 
+    // Iniciamos el proceso hijo directamente aquí
+    val className = "com.proferoman.part2.VocalCount"
+    val classPath = System.getProperty("java.class.path")
+
+    val processBuilder = ProcessBuilder(
+        "java", "-cp", classPath, className,
+        text, resultFile
+    )
+
+    println("Iniciando el proceso hijo...")
+
+    val vocalProcess = processBuilder.start()
+    vocalProcess.waitFor() // Espera que el proceso hijo termine
+
+    // Una vez que el proceso hijo termina, leemos el archivo generado
     val resultFileRead = File(resultFile)
-
     val countVocal = resultFileRead.readText().toInt()
 
     println("Hay un total de ($countVocal) vocales en el texto")
-
 }

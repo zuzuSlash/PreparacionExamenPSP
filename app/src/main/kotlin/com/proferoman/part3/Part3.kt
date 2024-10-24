@@ -53,6 +53,7 @@
  * Proceso con PID 168326: buscando vocales en "abras."
  * Hay un total de 23 vocales en el texto dado.
  */
+
 package com.proferoman.part3
 
 import java.io.File
@@ -71,28 +72,13 @@ class VocalCount {
             val filePath = args[1]
 
             vocalCount(text, filePath)
-
         }
     }
 }
 
-fun launchVocal(text: String, resultFile: String): Process {
-    val className = "com.proferoman.part2.VocalCount"
-    val classPath = System.getProperty("java.class.path")
-
-    println("Aqui se inicia el proceso hijo")
-    val processBuilder = ProcessBuilder(
-        "java", "-cp", classPath, className,
-        text, resultFile
-    )
-
-    return processBuilder.start()
-
-}
-
-fun vocalCount(text: String, fileName: String){
-    var countVocal = 0;
-    val vocales = setOf('a','e','i','o','u')
+fun vocalCount(text: String, fileName: String) {
+    var countVocal = 0
+    val vocales = setOf('a', 'e', 'i', 'o', 'u')
 
     val lowerText = text.lowercase(Locale.getDefault())
         .replace("á", "a")
@@ -109,40 +95,49 @@ fun vocalCount(text: String, fileName: String){
 
     val file = File(fileName)
     file.writeText(countVocal.toString())
-
 }
 
 fun main3(text: String, chunkSize: Int) {
     println("Inicio proceso padre")
+    val pathDir = "./files/part3"
+
     val processes = mutableListOf<Process>()
-    val pathDir = "./files/part2"
 
     var count = 1
     var from = 0
 
     while (from < text.length) {
-        // Calculate the range for the current chunk
+        // Calcula el rango para el chunk actual
         val to = if (from + chunkSize < text.length) from + chunkSize else text.length
         val chunk = text.substring(from, to)
 
-        // Prepare the result file path
+        // Prepara la ruta del archivo de resultado
         val resultFile = "$pathDir/file$count.txt"
 
-        // Launch the process to count vowels in the chunk
-        println("Lanzando proceso $count para contar vocales en: \"$chunk\"")
-        processes.add(launchVocal(chunk, resultFile))
+        // Inicia el proceso hijo directamente aquí
+        val className = "com.proferoman.part3.VocalCount"
+        val classPath = System.getProperty("java.class.path")
 
-        // Move to the next chunk
+
+        println("Lanzando proceso $count para contar vocales en: \"$chunk\"")
+        val processBuilder = ProcessBuilder(
+            "java", "-cp", classPath, className,
+            chunk, resultFile
+        )
+
+        processes.add(processBuilder.start())
+
+        // Mueve al siguiente chunk
         from += chunkSize
         count++
     }
 
-    // Wait for all processes to finish
+    // Espera a que todos los procesos terminen
     for (p in processes) {
         p.waitFor()
     }
 
-    // Compute total vowels
+    // Calcula el total de vocales
     var totalVowels = 0
     try {
         for (i in 1 until count) {
@@ -156,4 +151,3 @@ fun main3(text: String, chunkSize: Int) {
         e.printStackTrace()
     }
 }
-
